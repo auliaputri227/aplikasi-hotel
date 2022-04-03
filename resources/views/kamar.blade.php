@@ -94,40 +94,52 @@
                                     <div class="col-md-7">
                                         <label for="nama_pemesan" class="form-label">Nama Pemesan</label>
                                         <input type="text" class="form-control mb-3" name="nama_pemesan"
-                                            id="nama_pemesan">
+                                            id="nama_pemesan" value="{{ old('nama_pemesan') }}">
                                     </div>
                                     <div class="col-md-5">
                                         <label for="nama_pemesan" class="form-label">No Identitas</label>
                                         <input type="text" class="form-control mb-3" name="no_identitas"
-                                            id="no_identitas">
+                                            id="no_identitas" value="{{ old('no_identitas') }}">
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6">
                                         <label for="no_hp" class="form-label">No Hp</label>
-                                        <input type="number" class="form-control mb-3" name="no_hp" id="no_hp">
+                                        <input type="number" class="form-control mb-3" name="no_hp" id="no_hp"
+                                            value="{{ old('no_hp') }}">
                                     </div>
                                     <div class="col-md-6">
                                         <label for="email" class="form-label">Email</label>
-                                        <input type="email" class="form-control mb-3" name="email" id="email">
+                                        <input type="email" class="form-control mb-3" name="email" id="email"
+                                            value="{{ old('email') }}">
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <label for="jumlah" class="form-label">Jumlah Kamar</label>
-                                        <input type="number" class="form-control mb-3" name="jumlah" id="jumlah">
+                                        <label for="jumlah" class="form-label">Jumlah Kamar <span
+                                                class="text-danger fs-6" id="stok_sisa"></span></label>
+                                        @if ($message = Session::get('stok'))
+                                            <div class="alert alert-warning alert-block">
+                                                <strong>{{ $message }}</strong>
+                                            </div>
+                                        @endif
+                                        <input type="number"
+                                            class="form-control mb-3 {{ $message = Session::get('stok') ? 'is-invalid' : '' }}"
+                                            name="jumlah" id="jumlah" value="{{ old('jumlah') }}">
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6">
                                         <label for="check_in" class="form-label">Check In</label>
                                         <input type="date" class="form-control mb-3" name="check_in" id="check_in"
-                                            data-date-format="DD/MMM/YYYY" placeholder="dd/mm/yyyy">
+                                            data-date-format="DD/MMM/YYYY" placeholder="dd/mm/yyyy"
+                                            value="{{ old('check_in') }}">
                                     </div>
                                     <div class="col-md-6">
                                         <label for="check_out" class="form-label">Check Out</label>
                                         <input type="date" class="form-control mb-3" name="check_out" id="check_out"
-                                            data-date-format="DD/MMM/YYYY" placeholder="dd/mm/yyyy">
+                                            data-date-format="DD/MMM/YYYY" placeholder="dd/mm/yyyy"
+                                            value="{{ old('check_out') }}">
                                     </div>
                                 </div>
                             </div>
@@ -241,12 +253,10 @@
             const id = $(this).data('id');
             const dataTipe = findIdTipe(id);
 
-
-            $('#check_out').change(function() {
+            $('#jumlah').change(function() {
                 let check_in = new Date($('#check_in').val()).getTime();
-                let check_out = new Date($(this).val()).getTime();
-
-                // let jumlah_malam = hitungSelisihHari(check_in, check_out);
+                let check_out = new Date($('#check_out').val()).getTime();
+                let jumlah = $('#jumlah').val();
                 let Difference_In_Days = (Math.abs(check_in - check_out) / 86400000);
                 let per_malam = dataTipe.harga * Difference_In_Days;
 
@@ -254,7 +264,39 @@
                 let service = dataTipe.harga * 0.10;
 
                 let tax_serv = tax + service;
-                let total = Number(tax_serv) + Number(per_malam);
+                let sub_total = Number(per_malam) * Number(jumlah);
+
+                let total = Number(sub_total) + Number(tax_serv);
+
+                if (check_in == check_out || check_out <= check_in || isNan(total)) {
+                    $(this).addClass('is-invalid');
+                    $('#total').html('Rp 0');
+                    $('#tax-ser').html('Rp 0');
+                } else {
+                    $(this).removeClass('is-invalid');
+                    $('#total').html('Rp ' + new Intl.NumberFormat().format(total).replaceAll(',',
+                        '.'));
+                    $('#totals').val(total);
+                    $('#tax-ser').html('Rp ' + new Intl.NumberFormat().format(tax_serv).replaceAll(
+                        ',',
+                        '.'));
+                }
+            })
+
+            $('#check_out').change(function() {
+                let check_in = new Date($('#check_in').val()).getTime();
+                let check_out = new Date($('#check_out').val()).getTime();
+                let jumlah = $('#jumlah').val();
+                let Difference_In_Days = (Math.abs(check_in - check_out) / 86400000);
+                let per_malam = dataTipe.harga * Difference_In_Days;
+
+                let tax = dataTipe.harga * 0.11;
+                let service = dataTipe.harga * 0.10;
+
+                let tax_serv = tax + service;
+                let sub_total = Number(per_malam) * Number(jumlah);
+
+                let total = Number(sub_total) + Number(tax_serv);
 
                 if (check_in == check_out || check_out <= check_in) {
                     $(this).addClass('is-invalid');
@@ -265,15 +307,20 @@
                     $('#total').html('Rp ' + new Intl.NumberFormat().format(total).replaceAll(',',
                         '.'));
                     $('#totals').val(total);
-                    $('#tax-ser').html('Rp ' + new Intl.NumberFormat().format(tax_serv).replaceAll(',',
+                    $('#tax-ser').html('Rp ' + new Intl.NumberFormat().format(tax_serv).replaceAll(
+                        ',',
                         '.'));
                 }
             });
 
-            $('#tipe').html(dataTipe.tipe_kamar.charAt(0).toUpperCase() + dataTipe.tipe_kamar.slice(1))
-            $('#harga').html('Rp ' + new Intl.NumberFormat().format(dataTipe.harga).replaceAll(',', '.'));
+            $('#stok_sisa').html(dataTipe.stok + " (tersisa)");
+            $('#tipe').html(dataTipe.tipe_kamar.charAt(
+                0).toUpperCase() + dataTipe.tipe_kamar.slice(1));
+            $('#harga').html('Rp ' + new Intl
+                .NumberFormat().format(dataTipe.harga).replaceAll(',', '.'));
             $('#tax-ser').html('Rp 0');
-            $('#total').html('Rp 0');
+            $(
+                '#total').html('Rp 0');
             $('#id_tipe').val(dataTipe.id);
         });
     </script>

@@ -7,10 +7,12 @@ use App\Models\Reservasi;
 use App\Models\ReservedRoom;
 use App\Models\Tamu;
 use App\Models\TipeKamar;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use PDF;
+use Symfony\Component\Console\Input\Input;
 
 class GuestController extends Controller
 {
@@ -50,6 +52,12 @@ class GuestController extends Controller
             $tamu = $request->nama_pemesan;
         }
 
+        $id_tipes = TipeKamar::select('id')->where('stok', '>=', $request->jumlah)->where('id', $request->id_tipe)->first();
+
+        if (empty($id_tipes)) {
+            return redirect()->back()->withInput()->with('stok', 'Stok kurang dari jumlah!');
+        }
+
         $id_tamu = Tamu::insertGetId([
             'nama_pemesan' => $request->nama_pemesan,
             'no_identitas' => $request->no_identitas,
@@ -69,7 +77,7 @@ class GuestController extends Controller
             'uid' => $uid,
             'check_in' => $request->check_in,
             'check_out' => $request->check_in,
-            'jumlah_kamar' => '1',
+            'jumlah_kamar' => $request->jumlah,
             'id_tipe' => $request->id_tipe,
             'id_kamar' => $kamar->id,
             'status' => 'Reserved',
@@ -80,7 +88,7 @@ class GuestController extends Controller
         $id_tipes = TipeKamar::select('id')->where('stok', '>=', $request->jumlah)->where('id', $request->id_tipe)->first();
 
         if (empty($id_tipes)) {
-            return redirect()->back();
+            return redirect()->back()->withInput()->with('stok', 'Stok kurang dari jumlah!');
         }
 
         $kamars = Kamar::where('id_tipe', $id_tipes->id)->where('id_status', '2')->limit($request->jumlah)->get();
@@ -101,18 +109,34 @@ class GuestController extends Controller
 
     public function detail_res($id)
     {
-        return view('detail-reservasi');
-    }
+        $res = Reservasi::where('uid', $id)->first();
 
-    public function downloadBukti()
-    {
         $data = [
-            'title' => 'Welcome to ItSolutionStuff.com',
-            'date' => date('m/d/Y')
+            'reservasi' => Reservasi::where('uid', $id)->first(),
+            'tamu' => Tamu::where('id', $res->id_tamu)->first(),
+            'reserved' => ReservedRoom::where('id_reservasi', $res->id)->get(),
+            'kamar' => Kamar::all(),
+            'tipe' => TipeKamar::all(),
         ];
 
-        $pdf = PDF::loadView('detail-reservasi', $data);
+        return view('detail-reservasi', compact('data'));
+    }
 
-        return $pdf->download('itsolutionstuff.pdf');
+    public function downloadBukti($id)
+    {
+        $res = Reservasi::where('uid', $id)->first();
+
+        $data = [
+            'reservasi' => Reservasi::where('uid', $id)->first(),
+            'tamu' => Tamu::where('id', $res->id_tamu)->first(),
+            'reserved' => ReservedRoom::where('id_reservasi', $res->id)->get(),
+            'kamar' => Kamar::all(),
+            'tipe' => TipeKamar::all(),
+        ];
+
+        $pdf = PDF::loadView('bukti', compact('data'));
+        // return view('bukti', compact('data'));
+
+        return $pdf->download($data['tamu']->nama_tamu . '_' . date('dmY', strtotime(Carbon::now())) . '.pdf');
     }
 }

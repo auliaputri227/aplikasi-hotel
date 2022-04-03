@@ -5,6 +5,10 @@
             <h6 class="m-0 font-weight-bold text-primary">DataTables Example</h6>
         </div>
         <div class="card-body">
+            <button class="btn btn-success mb-3 mr-3" id="excel"><i class="fas fa-file-excel pr-2"></i> Export
+                Excel</button>
+            <a href="{{ route('export-pdf') }}" class="btn btn-danger mb-3"><i class="fas fa-file-pdf pr-2"></i> Export
+                PDF</a>
             <div class="table-responsive">
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
@@ -14,7 +18,7 @@
                             <th>Tanggal Cek-In</th>
                             <th>Tanggal Cek-Out</th>
                             <th>Status</th>
-                            <th>Action</th>
+                            <th class="act">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -25,7 +29,7 @@
                                 <td>{{ $item->check_in }}</td>
                                 <td>{{ $item->check_out }}</td>
                                 <td>{{ $item->status }}</td>
-                                <td>
+                                <td class="act">
                                     <div class="btn-group">
                                         <button class="btn btn-info cek" data-toggle="modal" data-target="#konfirmModal"
                                             data-id="{{ $item->id_tamu }}">Check In</button>
@@ -65,6 +69,7 @@
     </div>
 @endsection
 @section('js')
+    <script src="{{ asset('assets/table2excel/dist/table2excel.js') }}"></script>
     <script>
         $(document).ready(function() {
             $('#dataTable').DataTable({
@@ -75,6 +80,15 @@
                 console.log(true);
                 let id = $(this).data('id');
                 $('#konfirm').attr('action', "daftar-tamu/check-in/" + id);
+            });
+
+            var table2excel = new Table2Excel();
+            $('#excel').click(function() {
+                $('.act').addClass('d-none');
+                table2excel.export(document.querySelectorAll("#dataTable"), 'daftar-tamu');
+                setTimeout(() => {
+                    $('.act').removeClass('d-none');
+                }, 1000);
             });
         });
     </script>

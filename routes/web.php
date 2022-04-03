@@ -33,7 +33,7 @@ Route::get('/index', [GuestController::class, 'index'])->name('index');
 Route::get('/fasilitas', [GuestController::class, 'fasilitas'])->name('fasilitas');
 Route::post('reservasi-stores', [GuestController::class, 'stored_reser'])->name('stored_res');
 Route::get('detail-reservasi/{id}', [GuestController::class, 'detail_res'])->name('detail-res');
-Route::get('/download', [GuestController::class, 'downloadBukti'])->name('download');
+Route::get('/download/{id}', [GuestController::class, 'downloadBukti'])->name('download');
 
 
 // Route::get('/home', function () {
@@ -71,5 +71,8 @@ Route::post('/fasilitas-hotel/update/{id}', [adminController::class, 'fasha_upda
 Route::get('/fasilitas-hotel/tambah', [adminController::class, 'fasha_tambah'])->name('fasha_tambah');
 Route::post('/fasilitas-hotel/stored', [adminController::class, 'fasha_stored'])->name('fasha_stored');
 Route::delete('/fasilitas-hotel/delete/{id}', [adminController::class, 'fasha_destroy'])->name('fasha_destroy');
+
+
 Route::get('/daftar-tamu', [ResepsionisController::class, 'daftar'])->name('daftar');
 Route::post('/daftar-tamu/check-in/{id}', [ResepsionisController::class, 'checkin'])->name('checkin');
+Route::get('/export-pdf',[ResepsionisController::class, 'exportPdf'])->name('export-pdf');
