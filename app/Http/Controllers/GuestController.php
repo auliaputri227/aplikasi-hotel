@@ -118,7 +118,6 @@ class GuestController extends Controller
             'kamar' => Kamar::all(),
             'tipe' => TipeKamar::all(),
         ];
-
         return view('detail-reservasi', compact('data'));
     }
 

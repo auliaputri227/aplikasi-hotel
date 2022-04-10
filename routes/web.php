@@ -32,7 +32,7 @@ Route::get('/kamars', [GuestController::class, 'kamar'])->name('kamars');
 Route::get('/index', [GuestController::class, 'index'])->name('index');
 Route::get('/fasilitas', [GuestController::class, 'fasilitas'])->name('fasilitas');
 Route::post('reservasi-stores', [GuestController::class, 'stored_reser'])->name('stored_res');
-Route::get('detail-reservasi/{id}', [GuestController::class, 'detail_res'])->name('detail-res');
+Route::get('detail-reservasi/{id}', [GuestController::class, 'detail_res'])->name('detail-res');                                                                                                                                                                                                        
 Route::get('/download/{id}', [GuestController::class, 'downloadBukti'])->name('download');
 
 

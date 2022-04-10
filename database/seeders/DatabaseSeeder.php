@@ -72,17 +72,17 @@ class DatabaseSeeder extends Seeder
         ]);
 
         DB::table('fasilitas_kamars')->insert([
-            'nama_fasilitas' => 'jsohuhwhejhewl',
+            'nama_fasilitas' => 'TV',
             'id_tipe' => '1'
         ]);
 
         DB::table('fasilitas_kamars')->insert([
-            'nama_fasilitas' => 'jsohuhwhejhewl',
+            'nama_fasilitas' => 'AC',
             'id_tipe' => '1'
         ]);
 
         DB::table('fasilitas_kamars')->insert([
-            'nama_fasilitas' => 'jsohuhwhejhewl',
+            'nama_fasilitas' => 'Sofa',
             'id_tipe' => '2'
         ]);
 
@@ -109,14 +109,14 @@ class DatabaseSeeder extends Seeder
 
         DB::table('fasilitas_hotels')->insert([
             'nama_fasilitas' => 'TV',
-            'deskripsi' => 'shihpqhwihdw',
-            'image' => 'Lorem.png',
+            'deskripsi' => 'Bar',
+            'image' => 'fasilitas6.jpg',
         ]);
 
         DB::table('fasilitas_hotels')->insert([
             'nama_fasilitas' => 'TV',
-            'deskripsi' => 'shihpqhwihdw',
-            'image' => 'Lorem.png',
+            'deskripsi' => 'Free Breakfast',
+            'image' => 'fasilitas2.jpg',
         ]);
 
         // $rand = Str::random(10);
